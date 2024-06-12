@@ -142,7 +142,10 @@ def _sort_and_save_data_frame(experiment_name: str, intensities: dict) -> pd.Dat
     if OUTPUT_DIR.exists() is False:
         os.mkdir(OUTPUT_DIR)
     print("Saving intensities as {experiment_name}.csv...")
-    df.to_csv(f"{OUTPUT_DIR}/{experiment_name}.csv")
+    try:
+        df.to_csv(f"{OUTPUT_DIR}/{experiment_name}.csv")
+    except Exception as e:
+        print(f"Error saving {experiment_name}.csv!!!\n{e}")
     return df
 
 

@@ -46,7 +46,7 @@ if not isinstance(PIXELS_TO_SUBTRACT, list) or not all(
     raise TypeError("Pixels to subtract must be a list of tuples.")
 
 
-def stellectrum_generator():
+def stellectrum():
     """Top level function to parse, save, and plot data."""
     for root_dir, _, files in os.walk(ROOT_DIR):
         files = [f for f in files if "LA" in f and f.endswith(".tif")]
@@ -169,4 +169,4 @@ def _plot_max_spectra(experiment_name: str, df: pd.DataFrame):
     plt.show()
 
 
-stellectrum_generator()
+stellectrum()

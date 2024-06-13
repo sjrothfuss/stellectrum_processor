@@ -190,7 +190,7 @@ def _subtract_hot_pixels(tif: np.ndarray) -> np.ndarray:
     for pixel in PIXELS_TO_SUBTRACT:
         x, y = pixel
         if 0 < x < tif.shape[0] - 1 and 0 < y < tif.shape[1] - 1:
-            tif[x - 1 : x + 2, y - 1 : y + 2] = np.median(tif)
+            tif[x - 1 : x + 2, y - 1 : y + 2] = np.mean(tif)
         else:
             print(f"Hot pixel index {pixel} out of bounds, skipping.")
     return tif

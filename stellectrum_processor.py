@@ -1,9 +1,14 @@
 """A script to process, plot, and save fluorescence stellectra data.
 
+This script is designed to take a directory containing subdirectories of
+fluorescence data recorded as .tifs. The script will process each .tif
+file, sum the pixel intensities, and save the data as a .csv file. The
+script will also plot the excitation and emission spectra for the
+maximum intensity of each experiment.
+
 SJR 202406"""
 
 import os
-import re
 from pathlib import Path
 
 import numpy as np
@@ -27,17 +32,19 @@ LAMBDA_2_RANGE = {  # Start and end of lambda2 (usually excitation) in nm, use a
 LAMBDA_2_STEP = 2  # Stepsize of lambda2 in nm, if stepsize varies among experiments, use a dict with format {directory_name: stepsize}
 
 ### Output options
-WILL_SAVE_SPECTRA = False  # Save spectra as one .csv file per experiment
+WILL_SAVE_DATA = False  # Save fluorescence intensties as one .csv file per experiment
 WILL_PLOT_SPECTRA = True  # Plot spectra for max excitation and emission
+PLOT_FORMAT = "subplots"  # "subplots" to show both ex/em on one figure or "individual" to show separately
 
 ###################################################
 
-# Check dirs
+# Check inputs
+## Check dirs
 ROOT_DIR = Path(ROOT_DIR)
 if not ROOT_DIR.exists():
     raise FileNotFoundError(f"Root directory {ROOT_DIR} not found.")
 OUTPUT_DIR = Path(OUTPUT_DIR)
-# Check LAMBDA_2_STEP
+## Check LAMBDA_2_STEP
 if isinstance(LAMBDA_2_STEP, (int, float)):
     if LAMBDA_2_STEP <= 0:
         msg = "Invalid LAMBDA_2_STEP, must be greater than 0."
@@ -51,7 +58,7 @@ else:
         f"LAMBDA_2_STEP is {type(LAMBDA_2_STEP).__name__}, must be a number or a dict."
     )
     raise TypeError(msg)
-# Check LAMBDA_2_RANGE
+## Check LAMBDA_2_RANGE
 if isinstance(LAMBDA_2_RANGE, (tuple, list)):
     if len(LAMBDA_2_RANGE) != 2:
         msg = "LAMBDA_2_RANGE lists or tuples must be of length 2."
@@ -76,11 +83,15 @@ elif isinstance(LAMBDA_2_RANGE, dict):
 else:
     msg = f"LAMBDA_2_RANGE type is {type(LAMBDA_2_RANGE).__name__}, must be a list, tuple, or dict."
     raise TypeError(msg)
-# Check PIXELS_TO_SUBTRACT
+## Check PIXELS_TO_SUBTRACT
 if not isinstance(PIXELS_TO_SUBTRACT, list) or not all(
     isinstance(p, tuple) for p in PIXELS_TO_SUBTRACT
 ):
     raise TypeError("Pixels to subtract must be a list of tuples.")
+## Check output options
+if PLOT_FORMAT not in ["subplots", "individual"]:
+    raise ValueError("PLOT_FORMAT must be 'subplots' or 'individual'.")
+## Assert types
 assert isinstance(ROOT_DIR, Path)
 assert isinstance(OUTPUT_DIR, Path)
 assert isinstance(LAMBDA_2_RANGE, (dict, tuple, list))
@@ -203,11 +214,11 @@ def _sort_and_save_data_frame(experiment_name: str, intensities: dict) -> pd.Dat
     df.sort_index(axis=0, inplace=True)
     df.sort_index(axis=1, inplace=True)
 
-    if not WILL_SAVE_SPECTRA:
+    if not WILL_SAVE_DATA:
         return df
     if OUTPUT_DIR.exists() is False:
         os.mkdir(OUTPUT_DIR)
-    print("Saving intensities as {experiment_name}.csv...")
+    print(f"Saving intensities as {experiment_name}.csv...")
     try:
         df.to_csv(f"{OUTPUT_DIR}/{experiment_name}.csv")
     except Exception as e:
@@ -222,17 +233,34 @@ def _plot_max_spectra(experiment_name: str, df: pd.DataFrame):
     max_loc = df.stack().idxmax()
     max_lambda1 = df.loc[max_loc[0]]
     max_lambda2 = df[max_loc[1]]
-    plt.plot(max_lambda1)
-    plt.xlabel("Wavelength (nm)")
-    plt.ylabel("Intensity (a.u.)")
-    plt.title(f"{experiment_name}: Lambda 1 spectrum at {max_loc[0]} nm")
-    plt.show()
 
-    plt.plot(max_lambda2)
-    plt.xlabel("Wavelength (nm)")
-    plt.ylabel("Intensity (a.u.)")
-    plt.title(f"{experiment_name}: Lambda 2 spectrum at {max_loc[1]} nm")
-    plt.show()
+    if PLOT_FORMAT == "subplots":
+        _, (ax1, ax2) = plt.subplots(2, 1)
+
+        ax1.plot(max_lambda1)
+        ax1.set_xlabel("Wavelength (nm)")
+        ax1.set_ylabel("Intensity (a.u.)")
+        ax1.set_title(f"{experiment_name}: Lambda 1 spectrum at {max_loc[0]} nm")
+
+        ax2.plot(max_lambda2)
+        ax2.set_xlabel("Wavelength (nm)")
+        ax2.set_ylabel("Intensity (a.u.)")
+        ax2.set_title(f"{experiment_name}: Lambda 2 spectrum at {max_loc[1]} nm")
+
+        plt.tight_layout()
+        plt.show()
+    elif PLOT_FORMAT == "individual":
+        plt.plot(max_lambda1)
+        plt.xlabel("Wavelength (nm)")
+        plt.ylabel("Intensity (a.u.)")
+        plt.title(f"{experiment_name}: Lambda 1 spectrum at {max_loc[0]} nm")
+        plt.show()
+
+        plt.plot(max_lambda2)
+        plt.xlabel("Wavelength (nm)")
+        plt.ylabel("Intensity (a.u.)")
+        plt.title(f"{experiment_name}: Lambda 2 spectrum at {max_loc[1]} nm")
+        plt.show()
 
 
 stellectrum()

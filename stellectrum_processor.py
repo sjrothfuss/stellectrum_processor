@@ -235,7 +235,7 @@ def _plot_max_spectra(experiment_name: str, df: pd.DataFrame):
     max_lambda2 = df[max_loc[1]]
 
     if PLOT_FORMAT == "subplots":
-        _, (ax1, ax2) = plt.subplots(2, 1)
+        _, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10))
 
         ax1.plot(max_lambda1)
         ax1.set_xlabel("Wavelength (nm)")

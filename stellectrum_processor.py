@@ -18,8 +18,8 @@ import matplotlib.pyplot as plt
 
 ##################### OPTIONS #####################
 ### Input and output directories
-ROOT_DIR = "/Users/spencer/Library/CloudStorage/OneDrive-Vanderbilt/Documents - wan_lab_vanderbilt/Wan Lab - Spencer/Projects SJR/CryoSpectra/RawData/"  # Root directory of experimental data directories
-OUTPUT_DIR = f"{ROOT_DIR}/../Output/"  # Output directory for processed data
+ROOT_DIR = "RawData/"  # Root directory of experimental data directories
+OUTPUT_DIR = "Output/"  # Output directory for processed data
 
 ### Image processing options
 PIXELS_TO_SUBTRACT = [  # Coordinates of hot pixels to subtract from all images, if any
@@ -27,14 +27,14 @@ PIXELS_TO_SUBTRACT = [  # Coordinates of hot pixels to subtract from all images,
 ]
 # Since filenames do not include lambda2 wavelengths, they are calculated from range and stepsize
 LAMBDA_2_RANGE = {  # Start and end of lambda2 (usually excitation) in nm, use a dict with format {directory_name: (start, end)}
-    "20240530-cryo-GFP": (485, 581),
+    "Cryo-GFP": (485, 581),
 }
 LAMBDA_2_STEP = 2  # Stepsize of lambda2 in nm, if stepsize varies among experiments, use a dict with format {directory_name: stepsize}
 
 ### Output options
-WILL_SAVE_DATA = True  # Save fluorescence intensties as one .csv file per experiment
+WILL_SAVE_DATA = False  # Save fluorescence intensties as one .csv file per experiment
 WILL_PLOT_SPECTRA = True  # Plot spectra for max excitation and emission
-PLOT_FORMAT = "individual"  # "subplots" to show both ex/em on one figure or "individual" to show separately
+PLOT_FORMAT = "subplots"  # "subplots" to show both ex/em on one figure or "individual" to show separately
 
 ###################################################
 

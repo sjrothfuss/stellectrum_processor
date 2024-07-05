@@ -18,8 +18,8 @@ import matplotlib.pyplot as plt
 
 ##################### OPTIONS #####################
 ### Input and output directories
-ROOT_DIR = "RawData/"  # Root directory of experimental data directories
-OUTPUT_DIR = "Output/"  # Output directory for processed data
+ROOT_DIR = "/Users/spencer/Library/CloudStorage/OneDrive-Vanderbilt/Documents - wan_lab_vanderbilt/Wan Lab - Spencer/Projects SJR/CryoSpectra/RawData/"  # Root directory of experimental data directories
+OUTPUT_DIR = f"{ROOT_DIR}/../Output/"  # Output directory for processed data
 
 ### Image processing options
 PIXELS_TO_SUBTRACT = [  # Coordinates of hot pixels to subtract from all images, if any
@@ -27,14 +27,14 @@ PIXELS_TO_SUBTRACT = [  # Coordinates of hot pixels to subtract from all images,
 ]
 # Since filenames do not include lambda2 wavelengths, they are calculated from range and stepsize
 LAMBDA_2_RANGE = {  # Start and end of lambda2 (usually excitation) in nm, use a dict with format {directory_name: (start, end)}
-    "Cryo-GFP": (485, 581),
+    "20240530-cryo-GFP": (485, 581),
 }
 LAMBDA_2_STEP = 2  # Stepsize of lambda2 in nm, if stepsize varies among experiments, use a dict with format {directory_name: stepsize}
 
 ### Output options
-WILL_SAVE_DATA = False  # Save fluorescence intensties as one .csv file per experiment
+WILL_SAVE_DATA = True  # Save fluorescence intensties as one .csv file per experiment
 WILL_PLOT_SPECTRA = True  # Plot spectra for max excitation and emission
-PLOT_FORMAT = "subplots"  # "subplots" to show both ex/em on one figure or "individual" to show separately
+PLOT_FORMAT = "individual"  # "subplots" to show both ex/em on one figure or "individual" to show separately
 
 ###################################################
 
@@ -248,7 +248,7 @@ def _plot_max_spectra(experiment_name: str, df: pd.DataFrame):
 
         ax2.plot(max_lambda2, "o")
         ax2.set_xlabel("Wavelength (nm)")
-        ax2.set_ylabel("Intensity (a.u.)")
+        ax2.set_ylabel("Fluorescence Intensity (a.u.)")
         ax2.set_title(f"{experiment_name}: Lambda 2 spectrum at {max_loc[1]} nm")
         ax2.tick_params(axis="y", which="both", left=False, labelleft=False)
 
@@ -265,7 +265,7 @@ def _plot_max_spectra(experiment_name: str, df: pd.DataFrame):
 
         plt.plot(max_lambda2, "o")
         plt.xlabel("Wavelength (nm)")
-        plt.ylabel("Intensity (a.u.)")
+        plt.ylabel("Fluorescence Intensity (a.u.)")
         plt.title(f"{experiment_name}: Lambda 2 spectrum at {max_loc[1]} nm")
         plt.tick_params(axis="y", which="both", left=False, labelleft=False)
         plt.show()

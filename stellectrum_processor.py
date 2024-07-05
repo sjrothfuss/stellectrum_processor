@@ -185,26 +185,28 @@ def _process_tif_file(file_path: Path) -> int:
     """Process a .tif file and return the sum of pixel intensities."""
     # print(file_path)
     tif = np.array(Image.open(file_path))
-    tif = _normalize_standardize_tif(tif)
-    return np.sum(tif)
+    tif, mask = _normalize_standardize_tif(tif)
+    return np.sum(tif * mask)
 
 
 def _normalize_standardize_tif(tif: np.ndarray) -> np.ndarray:
     """Placeholder function for any image modification steps."""
-    tif = _subtract_hot_pixels(tif)
+    mask = _create_hot_pixel_mask(tif)
     # Add other standardization steps here if desired
-    return tif
+    return tif, mask
 
 
-def _subtract_hot_pixels(tif: np.ndarray) -> np.ndarray:
-    """Replace hot pixels with the median of the image."""
+def _create_hot_pixel_mask(tif: np.ndarray, mask: np.ndarray = None) -> np.ndarray:
+    """Create a mask to remove hot pixels in the image."""
+    if not mask:
+        mask = np.ones_like(tif)
     for pixel in PIXELS_TO_SUBTRACT:
         x, y = pixel
-        if 0 < x < tif.shape[0] - 1 and 0 < y < tif.shape[1] - 1:
-            tif[x - 1 : x + 2, y - 1 : y + 2] = np.mean(tif)
+        if 0 < x < mask.shape[0] - 1 and 0 < y < mask.shape[1] - 1:
+            mask[x - 1 : x + 2, y - 1 : y + 2] = 0
         else:
             print(f"Hot pixel index {pixel} out of bounds, skipping.")
-    return tif
+    return mask
 
 
 def _sort_and_save_data_frame(experiment_name: str, intensities: dict) -> pd.DataFrame:

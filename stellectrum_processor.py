@@ -18,8 +18,8 @@ import matplotlib.pyplot as plt
 
 ##################### OPTIONS #####################
 ### Input and output directories
-ROOT_DIR = f"{os.getcwd()}/RawData"  # Root directory of experimental data directories
-OUTPUT_DIR = f"{os.getcwd()}/Output"  # Output directory for processed data
+ROOT_DIR = "RawData/"  # Root directory of experimental data directories
+OUTPUT_DIR = "Output/"  # Output directory for processed data
 
 ### Image processing options
 PIXELS_TO_SUBTRACT = [  # Coordinates of hot pixels to subtract from all images, if any
@@ -40,10 +40,10 @@ PLOT_FORMAT = "subplots"  # "subplots" to show both ex/em on one figure or "indi
 
 # Check inputs
 ## Check dirs
-ROOT_DIR = Path(ROOT_DIR)
+ROOT_DIR = Path(ROOT_DIR).resolve()
 if not ROOT_DIR.exists():
     raise FileNotFoundError(f"Root directory {ROOT_DIR} not found.")
-OUTPUT_DIR = Path(OUTPUT_DIR)
+OUTPUT_DIR = Path(OUTPUT_DIR).resolve()
 ## Check LAMBDA_2_STEP
 if isinstance(LAMBDA_2_STEP, (int, float)):
     if LAMBDA_2_STEP <= 0:
@@ -228,6 +228,7 @@ def _sort_and_save_data_frame(experiment_name: str, intensities: dict) -> pd.Dat
 
 def _plot_max_spectra(experiment_name: str, df: pd.DataFrame):
     """Plot the exictation spectra for the max emission and vice versa."""
+    # TODO: set colors from wavelengths. Either a single color for max wavelength or a gradient
     if not WILL_PLOT_SPECTRA:
         return
     max_loc = df.stack().idxmax()
@@ -237,29 +238,34 @@ def _plot_max_spectra(experiment_name: str, df: pd.DataFrame):
     if PLOT_FORMAT == "subplots":
         _, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10))
 
-        ax1.plot(max_lambda1)
+        ax1.plot(max_lambda1, "o")
         ax1.set_xlabel("Wavelength (nm)")
-        ax1.set_ylabel("Intensity (a.u.)")
+        ax1.set_ylabel("Fluorescence Intensity (a.u.)")
         ax1.set_title(f"{experiment_name}: Lambda 1 spectrum at {max_loc[0]} nm")
+        ax1.tick_params(axis="y", which="both", left=False, labelleft=False)
 
-        ax2.plot(max_lambda2)
+        ax2.plot(max_lambda2, "o")
         ax2.set_xlabel("Wavelength (nm)")
         ax2.set_ylabel("Intensity (a.u.)")
         ax2.set_title(f"{experiment_name}: Lambda 2 spectrum at {max_loc[1]} nm")
+        ax2.tick_params(axis="y", which="both", left=False, labelleft=False)
 
         plt.tight_layout()
         plt.show()
+
     elif PLOT_FORMAT == "individual":
-        plt.plot(max_lambda1)
+        plt.plot(max_lambda1, "o")
         plt.xlabel("Wavelength (nm)")
-        plt.ylabel("Intensity (a.u.)")
+        plt.ylabel("Fluorescence Intensity (a.u.)")
         plt.title(f"{experiment_name}: Lambda 1 spectrum at {max_loc[0]} nm")
+        plt.tick_params(axis="y", which="both", left=False, labelleft=False)
         plt.show()
 
-        plt.plot(max_lambda2)
+        plt.plot(max_lambda2, "o")
         plt.xlabel("Wavelength (nm)")
         plt.ylabel("Intensity (a.u.)")
         plt.title(f"{experiment_name}: Lambda 2 spectrum at {max_loc[1]} nm")
+        plt.tick_params(axis="y", which="both", left=False, labelleft=False)
         plt.show()
 
 

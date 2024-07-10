@@ -1,2 +1,2 @@
 # stellectrum_processor
-A notebook for processing and plotting fluorescence scans from the Leica Stellaris.
+A script for plotting fluorescence scans from the Leica Stellaris 5.
